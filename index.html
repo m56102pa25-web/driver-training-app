@@ -786,8 +786,7 @@ function switchTab(id) {
   activeTab = id;
   renderTabBar();
   renderContent();
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
+  requestAnimationFrame(() => window.scrollTo(0, 0));
 }
 
 renderTabBar();
