@@ -100,15 +100,16 @@ body {
 }
 
 /* ---- タブ切替スライドアニメーション ---- */
-.slide-overlay {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  overflow: hidden;
-  z-index: 15;
-  pointer-events: none;
-  background: var(--bg);
-  will-change: transform;
+@keyframes slideFromRight {
+  from { opacity: 0.3; transform: translateX(80%); }
+  to   { opacity: 1;   transform: translateX(0); }
 }
+@keyframes slideFromLeft {
+  from { opacity: 0.3; transform: translateX(-80%); }
+  to   { opacity: 1;   transform: translateX(0); }
+}
+.content.anim-fwd  { animation: slideFromRight 0.33s cubic-bezier(0.25, 0.8, 0.35, 1); }
+.content.anim-back { animation: slideFromLeft 0.33s cubic-bezier(0.25, 0.8, 0.35, 1); }
 
 /* ---- section label ---- */
 .sec-label {
@@ -797,47 +798,17 @@ function switchTab(id) {
   const oldIdx = TABS.findIndex(t => t.id === activeTab);
   const newIdx = TABS.findIndex(t => t.id === id);
   if (newIdx === oldIdx) return;
-  const dir = newIdx > oldIdx ? 1 : -1;
 
-  const main = document.getElementById('mainContent');
-
-  // 実行中のアニメーションをキャンセル
-  document.querySelectorAll('.slide-overlay').forEach(el => el.remove());
-  main.style.cssText = '';
-
-  // 現在の内容をオーバーレイで固定
-  const stickyH = document.querySelector('.sticky-top').offsetHeight;
-  const overlay = document.createElement('div');
-  overlay.className = 'slide-overlay';
-  overlay.style.top = stickyH + 'px';
-  const snapshot = main.cloneNode(true);
-  overlay.appendChild(snapshot);
-  document.body.appendChild(overlay);
-
-  // 新しいタブに切替・描画
   activeTab = id;
   renderTabBar();
   renderContent();
-  window.scrollTo(0, 0);
+  requestAnimationFrame(() => window.scrollTo(0, 0));
 
-  // 新しい内容を画面外にセット
-  main.style.transform = `translateX(${dir * 100}%)`;
-  main.style.transition = 'none';
-
-  // 旧コンテンツ(overlay)と新コンテンツ(main)を同時にスライド
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    const ease = 'transform 0.38s cubic-bezier(0.25, 0.8, 0.35, 1)';
-    overlay.style.transition = ease;
-    overlay.style.transform = `translateX(${-dir * 100}%)`;
-    main.style.transition = ease;
-    main.style.transform = 'translateX(0)';
-
-    setTimeout(() => {
-      overlay.remove();
-      main.style.transform = '';
-      main.style.transition = '';
-    }, 420);
-  }));
+  // スライドアニメーション（次のタブ→右から / 前のタブ→左から）
+  const main = document.getElementById('mainContent');
+  main.classList.remove('anim-fwd', 'anim-back');
+  void main.offsetWidth; // アニメーションを再生し直すためリフロー
+  main.classList.add(newIdx > oldIdx ? 'anim-fwd' : 'anim-back');
 }
 
 renderTabBar();
