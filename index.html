@@ -100,10 +100,20 @@ body {
 }
 
 /* ---- content area ---- */
-.content {
+.panels-wrapper {
   flex: 1;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.panels-wrapper::-webkit-scrollbar { display: none; }
+.panel {
+  flex-shrink: 0;
+  width: 100%;
+  scroll-snap-align: start;
   overflow-y: auto;
-  scroll-behavior: auto;
   padding: 16px;
   padding-bottom: calc(40px + env(safe-area-inset-bottom));
 }
@@ -239,7 +249,7 @@ body {
     <nav class="tabs" id="tabBar" role="tablist"></nav>
   </div>
 
-  <main class="content" id="mainContent"></main>
+  <div class="panels-wrapper" id="panelsWrapper"></div>
 
 </div>
 <script>
@@ -732,9 +742,9 @@ function renderTabBar() {
   }, 0);
 }
 
-function renderContent() {
-  const main = document.getElementById('mainContent');
-  const tab = TABS.find(t => t.id === activeTab);
+function renderContent(tab, target) {
+  const main = target || document.getElementById('mainContent');
+  if (!tab) tab = TABS.find(t => t.id === activeTab);
   if (!tab) return;
 
   if (tab.type === 'company') {
@@ -792,16 +802,40 @@ function renderContent() {
   main.innerHTML = html;
 }
 
+function renderAllPanels() {
+  const wrapper = document.getElementById('panelsWrapper');
+  wrapper.innerHTML = TABS.map(t => `<div class="panel" id="panel-${t.id}"></div>`).join('');
+  TABS.forEach(t => renderContent(t, document.getElementById(`panel-${t.id}`)));
+}
+
 function switchTab(id) {
   if (id === activeTab) return;
   activeTab = id;
-  document.getElementById('mainContent').scrollTop = 0;
+  const idx = TABS.findIndex(t => t.id === id);
+  const wrapper = document.getElementById('panelsWrapper');
+  wrapper.scrollTo({ left: idx * wrapper.offsetWidth, behavior: 'smooth' });
   renderTabBar();
-  renderContent();
 }
 
 renderTabBar();
-renderContent();
+renderAllPanels();
+
+/* スワイプでタブ同期 */
+(function() {
+  const wrapper = document.getElementById('panelsWrapper');
+  let _t = null;
+  wrapper.addEventListener('scroll', () => {
+    clearTimeout(_t);
+    _t = setTimeout(() => {
+      const idx = Math.round(wrapper.scrollLeft / wrapper.offsetWidth);
+      const newId = TABS[idx]?.id;
+      if (newId && newId !== activeTab) {
+        activeTab = newId;
+        renderTabBar();
+      }
+    }, 80);
+  }, { passive: true });
+})();
 </script>
 <script>
 if ('serviceWorker' in navigator) {
