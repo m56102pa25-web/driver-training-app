@@ -26,20 +26,26 @@
   --shadow: 0 1px 4px rgba(0,0,0,0.07);
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; height: 100%; }
 body {
   font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  height: 100%;
 }
-.app { max-width: 480px; margin: 0 auto; min-height: 100vh; overflow-x: hidden; }
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
-/* ---- sticky header + tabs ---- */
+/* ---- fixed header + tabs ---- */
 .sticky-top {
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   z-index: 20;
   background: var(--card);
   border-bottom: 0.5px solid var(--border);
@@ -95,8 +101,11 @@ body {
 
 /* ---- content area ---- */
 .content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 16px;
-  padding-bottom: 40px;
+  padding-bottom: calc(40px + env(safe-area-inset-bottom));
 }
 
 
@@ -788,7 +797,7 @@ function switchTab(id) {
   activeTab = id;
   renderTabBar();
   renderContent();
-  requestAnimationFrame(() => window.scrollTo(0, 0));
+  document.getElementById('mainContent').scrollTop = 0;
 }
 
 renderTabBar();
