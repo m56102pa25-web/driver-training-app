@@ -103,7 +103,7 @@ body {
 .content {
   flex: 1;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  scroll-behavior: auto;
   padding: 16px;
   padding-bottom: calc(40px + env(safe-area-inset-bottom));
 }
@@ -795,9 +795,9 @@ function renderContent() {
 function switchTab(id) {
   if (id === activeTab) return;
   activeTab = id;
+  document.getElementById('mainContent').scrollTop = 0;
   renderTabBar();
   renderContent();
-  document.getElementById('mainContent').scrollTop = 0;
 }
 
 renderTabBar();
