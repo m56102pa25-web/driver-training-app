@@ -99,17 +99,6 @@ body {
   padding-bottom: 40px;
 }
 
-/* ---- タブ切替スライドアニメーション ---- */
-@keyframes slideFromRight {
-  from { opacity: 0.3; transform: translateX(80%); }
-  to   { opacity: 1;   transform: translateX(0); }
-}
-@keyframes slideFromLeft {
-  from { opacity: 0.3; transform: translateX(-80%); }
-  to   { opacity: 1;   transform: translateX(0); }
-}
-.content.anim-fwd  { animation: slideFromRight 0.33s cubic-bezier(0.25, 0.8, 0.35, 1); }
-.content.anim-back { animation: slideFromLeft 0.33s cubic-bezier(0.25, 0.8, 0.35, 1); }
 
 /* ---- section label ---- */
 .sec-label {
@@ -795,20 +784,11 @@ function renderContent() {
 }
 
 function switchTab(id) {
-  const oldIdx = TABS.findIndex(t => t.id === activeTab);
-  const newIdx = TABS.findIndex(t => t.id === id);
-  if (newIdx === oldIdx) return;
-
+  if (id === activeTab) return;
   activeTab = id;
   renderTabBar();
   renderContent();
-  requestAnimationFrame(() => window.scrollTo(0, 0));
-
-  // スライドアニメーション（次のタブ→右から / 前のタブ→左から）
-  const main = document.getElementById('mainContent');
-  main.classList.remove('anim-fwd', 'anim-back');
-  void main.offsetWidth; // アニメーションを再生し直すためリフロー
-  main.classList.add(newIdx > oldIdx ? 'anim-fwd' : 'anim-back');
+  window.scrollTo(0, 0);
 }
 
 renderTabBar();
