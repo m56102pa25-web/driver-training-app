@@ -802,11 +802,7 @@ function switchTab(id) {
   activeTab = id;
   renderTabBar();
   renderContent();
-
-  // スクロールを先頭に戻す（アニメ開始前に同期実行 → 横スライドと縦ジャンプの混在を防ぐ）
-  window.scrollTo(0, 0);
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
+  requestAnimationFrame(() => window.scrollTo(0, 0));
 
   // スライドアニメーション（次のタブ→右から / 前のタブ→左から）
   const main = document.getElementById('mainContent');
