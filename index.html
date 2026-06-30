@@ -181,6 +181,28 @@ body {
   line-height: 1.6;
 }
 
+/* ---- accordion ---- */
+.step-card { cursor: pointer; }
+.step-chevron {
+  margin-left: auto;
+  font-size: 11px;
+  color: #bbb;
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+  align-self: center;
+  padding-left: 6px;
+}
+.step-card.open .step-chevron { transform: rotate(180deg); }
+.step-content { display: none; }
+.step-card.open .step-content {
+  display: block;
+  animation: acFadeIn 0.2s ease;
+}
+@keyframes acFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ---- company overview ---- */
 .company-card {
   background: var(--card);
@@ -792,10 +814,13 @@ function renderContent(tab, target) {
         <div class="step-num">${s.no}</div>
         <div class="step-body">
           <div class="step-title">${s.title}</div>
-          <div class="step-desc">${s.desc.replace(/\n/g, '<br>')}</div>
-          ${s.point ? `<div class="step-point">▶ ${s.point.replace(/\n/g, '<br>')}</div>` : ''}
-          ${s.caution ? `<div class="step-caution">⚠ ${s.caution.replace(/\n/g, '<br>')}</div>` : ''}
+          <div class="step-content">
+            <div class="step-desc">${s.desc.replace(/\n/g, '<br>')}</div>
+            ${s.point ? `<div class="step-point">▶ ${s.point.replace(/\n/g, '<br>')}</div>` : ''}
+            ${s.caution ? `<div class="step-caution">⚠ ${s.caution.replace(/\n/g, '<br>')}</div>` : ''}
+          </div>
         </div>
+        <div class="step-chevron">▼</div>
       </div>`;
     });
   });
@@ -819,6 +844,13 @@ function switchTab(id) {
 
 renderTabBar();
 renderAllPanels();
+
+/* アコーディオン：タップで展開／閉じる */
+document.getElementById('panelsWrapper').addEventListener('click', e => {
+  const card = e.target.closest('.step-card');
+  if (!card) return;
+  card.classList.toggle('open');
+});
 
 /* スワイプでタブ同期 */
 (function() {
