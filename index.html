@@ -833,8 +833,14 @@ function renderAllPanels() {
   TABS.forEach(t => renderContent(t, document.getElementById(`panel-${t.id}`)));
 }
 
+function closeAccordion(tabId) {
+  const panel = document.getElementById(`panel-${tabId}`);
+  if (panel) panel.querySelectorAll('.step-card.open').forEach(c => c.classList.remove('open'));
+}
+
 function switchTab(id) {
   if (id === activeTab) return;
+  closeAccordion(activeTab);
   activeTab = id;
   const idx = TABS.findIndex(t => t.id === id);
   const wrapper = document.getElementById('panelsWrapper');
@@ -862,6 +868,7 @@ document.getElementById('panelsWrapper').addEventListener('click', e => {
       const idx = Math.round(wrapper.scrollLeft / wrapper.offsetWidth);
       const newId = TABS[idx]?.id;
       if (newId && newId !== activeTab) {
+        closeAccordion(activeTab);
         activeTab = newId;
         renderTabBar();
       }
