@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jfl-guide-v23';
+const CACHE_NAME = 'jfl-guide-v24';
 const ASSETS = ['./','./index.html','./manifest.json','./hero.jpg','./icon-180.png','./icon-192.png','./icon-512.png'];
 
 self.addEventListener('install', e => {
